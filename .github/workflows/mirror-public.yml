@@ -14,4 +14,4 @@ jobs:
       - name: Push main to public mirror
         env:
           TOKEN: ${{ secrets.PUBLIC_MIRROR_TOKEN }}
-        run: git push --force "https://x-access-token:${TOKEN}@github.com/junior-dl/docchat-public.git" HEAD:main
+        run: git push --force "https://x-access-token:${TOKEN}@github.com/junior-dl/docchat.git" HEAD:main
