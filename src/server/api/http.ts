@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getSession, startSession } from "../usecases/session.usecase";
-import { LimitError } from "../lib/limits";
+import { LimitError, GeminiUserError } from "../lib/limits";
 
 export const SESSION_COOKIE = "rag_sid";
 export const apiKeyFrom = (req: Request) => req.headers.get("x-gemini-key");
@@ -32,7 +32,7 @@ export function handle(fn: (req: Request, ctx: any) => Promise<unknown>) {
     try {
       return NextResponse.json(await fn(req, ctx));
     } catch (e) {
-      const status = e instanceof HttpError || e instanceof LimitError ? e.status : 500;
+      const status = e instanceof HttpError || e instanceof LimitError || e instanceof GeminiUserError ? e.status : 500;
       if (status === 500) console.error(e);
       return NextResponse.json({ error: status === 500 ? "Something went wrong." : (e as Error).message }, { status });
     }

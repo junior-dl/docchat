@@ -30,7 +30,7 @@ export function ChatPanel({ messages, pending, onAsk, disabled }: { messages: Me
                 </ol>
               </details>
             ) : null}
-            {m.usage && <p className="text-[11px] text-zinc-400 dark:text-zinc-500">↑ {m.usage.inputTokens.toLocaleString()} tokens sent · ↓ {m.usage.outputTokens.toLocaleString()} received</p>}
+            {m.usage && <p className="text-[11px] text-zinc-400 dark:text-zinc-500">↑ {m.usage.inputTokens.toLocaleString()} tokens sent · ↓ {m.usage.outputTokens.toLocaleString()} received{m.model ? ` · ${m.model}` : ""}</p>}
           </div>
         ))}
         {pending && <p className="animate-pulse text-sm text-zinc-500 dark:text-zinc-400">Searching your documents…</p>}

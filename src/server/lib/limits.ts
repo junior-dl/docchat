@@ -24,3 +24,7 @@ export const limitsFor = (k: KeySource) => (k === "own" ? OWN_KEY_LIMITS : DEFAU
 export class LimitError extends Error {
   status = 429;
 }
+
+export class GeminiUserError extends Error {
+  constructor(public status: number, message: string) { super(message); }
+}

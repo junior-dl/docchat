@@ -2,8 +2,8 @@ import { documentService } from "../services/document.service";
 import { chunkService } from "../services/chunk.service";
 import { usageService } from "../services/usage.service";
 import { readPdf, chunkPages } from "../lib/pdf";
-import { resolveKey, EMBED_MODEL, EMBED_DIMS, estimateTokens } from "../lib/gemini";
-import { limitsFor, LimitError } from "../lib/limits";
+import { resolveKey, EMBED_MODEL, EMBED_DIMS, estimateTokens, withGeminiRetry, geminiErrorMessage } from "../lib/gemini";
+import { limitsFor, LimitError, GeminiUserError } from "../lib/limits";
 
 export const listDocuments = (sessionId: string) => documentService.list(sessionId);
 export const deleteDocument = (sessionId: string, id: string) => documentService.remove(sessionId, id);
@@ -27,10 +27,12 @@ export async function uploadDocument(input: { sessionId: string; file: File; api
 
   const vectors: number[][] = [];
   for (let i = 0; i < pieces.length; i += 100) {
-    const res = await client.models.embedContent({
-      model: EMBED_MODEL,
-      contents: pieces.slice(i, i + 100).map((p) => p.content),
-      config: { taskType: "RETRIEVAL_DOCUMENT", outputDimensionality: EMBED_DIMS },
+    const batch = pieces.slice(i, i + 100).map((p) => p.content);
+    const res = await withGeminiRetry([EMBED_MODEL], (model) =>
+      client.models.embedContent({ model, contents: batch, config: { taskType: "RETRIEVAL_DOCUMENT", outputDimensionality: EMBED_DIMS } }),
+    ).catch((e) => {
+      const friendly = geminiErrorMessage(e, keySource);
+      throw friendly ? new GeminiUserError(friendly.status, friendly.message) : e;
     });
     vectors.push(...(res.embeddings ?? []).map((e) => e.values ?? []));
   }
