@@ -8,6 +8,7 @@ import { UsagePanel } from "@/components/usage-panel";
 import { ApiKeyForm } from "@/components/api-key-form";
 import { DocumentList } from "@/components/document-list";
 import { ChatPanel } from "@/components/chat-panel";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function ChatPage() {
   const { ready, expiresAt, endNow } = useSession();
@@ -15,15 +16,16 @@ export default function ChatPage() {
   const docs = useDocuments(ready, refresh);
   const chat = useChat(refresh);
   return (
-    <div className="flex h-dvh flex-col bg-slate-50 text-zinc-900">
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-5">
+    <div className="flex h-dvh flex-col bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold text-white">D</span>
           DocChat
         </Link>
-        <div className="flex items-center gap-4 text-xs text-zinc-500">
+        <div className="flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
           {expiresAt && <span className="hidden sm:inline">Auto-deletes {new Date(expiresAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>}
-          <button onClick={endNow} className="rounded-md border border-zinc-200 px-2.5 py-1 font-medium text-red-600 hover:bg-red-50">Delete my data</button>
+          <ThemeToggle />
+          <button onClick={endNow} className="rounded-md border border-zinc-200 dark:border-zinc-800 px-2.5 py-1 font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10">Delete my data</button>
         </div>
       </header>
       <main className="mx-auto grid w-full max-w-7xl flex-1 gap-4 overflow-hidden p-4 lg:grid-cols-[340px_1fr]">
