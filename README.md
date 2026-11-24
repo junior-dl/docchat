@@ -38,4 +38,4 @@ Neon (pgvector) → src/server/db (Drizzle schema + client)
 
 ## Repositories
 - `junior-dl/docchat-private` (private): all development happens here.
-- `junior-dl/docchat-public` (public): read-only mirror of `main`, updated automatically by `.github/workflows/mirror-public.yml`. Don't open PRs or commit there.
+- `junior-dl/docchat` (public): read-only mirror of `main`, updated automatically by `.github/workflows/mirror-public.yml`. Don't open PRs or commit there.
