@@ -35,7 +35,8 @@ async function ask(input: { sessionId: string; question: string; apiKey: string 
     return client.models.generateContent({
       model,
       contents: `Sources:\n${context}\n\nQuestion: ${input.question}`,
-      config: { systemInstruction: SYSTEM, temperature: 0.2 },
+      // Gemini 3.5+ no longer accepts temperature/top_p/top_k.
+      config: { systemInstruction: SYSTEM },
     });
   });
 

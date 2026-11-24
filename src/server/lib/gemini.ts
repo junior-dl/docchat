@@ -8,7 +8,7 @@ export function resolveKey(headerKey: string | null): { client: GoogleGenAI; key
   return { client: new GoogleGenAI({ apiKey }), keySource: own ? "own" : "default" };
 }
 
-export const CHAT_MODEL = process.env.GEMINI_CHAT_MODEL ?? "gemini-2.5-flash";
+export const CHAT_MODEL = process.env.GEMINI_CHAT_MODEL ?? "gemini-3.5-flash";
 export const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL ?? "gemini-embedding-001";
 export const EMBED_DIMS = 768;
 
@@ -16,7 +16,7 @@ export const EMBED_DIMS = 768;
 export const estimateTokens = (s: string) => Math.ceil(s.length / 4);
 
 // Fallback chat models, tried in order when the main model is overloaded.
-export const CHAT_FALLBACKS = (process.env.GEMINI_CHAT_FALLBACKS ?? "gemini-2.5-flash-lite")
+export const CHAT_FALLBACKS = (process.env.GEMINI_CHAT_FALLBACKS ?? "gemini-3.5-flash-lite,gemini-3.1-flash-lite")
   .split(",").map((m) => m.trim()).filter(Boolean);
 
 const statusOf = (e: unknown) => (e as { status?: number })?.status;
@@ -32,6 +32,8 @@ export async function withGeminiRetry<T>(models: string[], call: (model: string)
         return await call(model);
       } catch (e) {
         last = e;
+        // Retired or unknown model: skip to the next one instead of failing.
+        if (statusOf(e) === 404 && models.length > 1) break;
         if (!isTransient(e)) throw e;
         // A per-day quota error won't clear up with retries.
         if (statusOf(e) === 429 && /per.?day|daily/i.test(String((e as Error).message))) throw e;
@@ -51,6 +53,7 @@ export function geminiErrorMessage(e: unknown, keySource: "default" | "own"): { 
     return { status: 503, message: "Gemini is busy right now. Please try again in a minute." };
   if (status === 429)
     return { status: 429, message: keySource === "own" ? "Your Gemini key hit its rate limit. Wait a bit and try again." : "The free key hit Gemini's rate limit. Try again soon, or add your own key." };
+  if (status === 404) return { status: 502, message: "The configured Gemini model isn't available. Update GEMINI_CHAT_MODEL / GEMINI_CHAT_FALLBACKS." };
   if (status === 400 && /api key/i.test(msg)) return { status: 401, message: "That Gemini API key isn't valid. Check it and save again." };
   if (status === 401 || status === 403) return { status: 401, message: keySource === "own" ? "Your Gemini key was rejected. Check it in Google AI Studio." : "The default key was rejected. Add your own Gemini key." };
   return null;
