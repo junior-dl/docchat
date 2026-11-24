@@ -5,9 +5,15 @@ import type { Message } from "@/stores/types";
 export function ChatPanel({ messages, pending, onAsk, disabled }: { messages: Message[]; pending: boolean; onAsk: (q: string) => void; disabled: boolean }) {
   const [q, setQ] = useState("");
   return (
-    <section className="flex h-full min-h-[70vh] flex-col rounded-xl border border-zinc-200 bg-white">
+    <section className="flex min-h-[60vh] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-zinc-900 shadow-sm lg:min-h-0">
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
-        {!messages.length && <p className="pt-20 text-center text-sm text-zinc-500">{disabled ? "Upload a PDF to start." : "Ask anything about your documents."}</p>}
+        {!messages.length && (
+          <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-2xl">📄</div>
+            <p className="font-medium">{disabled ? "Upload a PDF to start" : "Ask anything about your documents"}</p>
+            <p className="max-w-sm text-sm text-zinc-500">{disabled ? "Handbooks, SOPs and FAQs work best. Answers cite the page they came from." : "Try: \"Summarize the key policies\" or \"What's the deadline for…?\""}</p>
+          </div>
+        )}
         {messages.map((m) => (
           <div key={m.id} className={m.role === "user" ? "ml-auto max-w-[80%] rounded-2xl bg-indigo-600 px-4 py-2 text-sm text-white" : "max-w-[90%] space-y-2"}>
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{m.content}</p>
@@ -31,7 +37,7 @@ export function ChatPanel({ messages, pending, onAsk, disabled }: { messages: Me
       </div>
       <form className="flex gap-2 border-t border-zinc-200 p-3" onSubmit={(e) => { e.preventDefault(); if (q.trim()) { onAsk(q.trim()); setQ(""); } }}>
         <input value={q} onChange={(e) => setQ(e.target.value)} disabled={disabled || pending} placeholder="e.g. What is the late-submission policy?"
-          className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm disabled:bg-zinc-50" />
+          className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 disabled:bg-zinc-50" />
         <button disabled={disabled || pending} className="rounded-lg bg-indigo-600 px-4 text-sm text-white disabled:opacity-50">Ask</button>
       </form>
     </section>

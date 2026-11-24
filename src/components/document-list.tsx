@@ -5,11 +5,11 @@ import type { DocumentItem } from "@/stores/types";
 export function DocumentList(p: { items: DocumentItem[]; uploading: string | null; error: string | null; onUpload: (f: File) => void; onRemove: (id: string) => void }) {
   const input = useRef<HTMLInputElement>(null);
   return (
-    <section className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
-      <h2 className="text-sm font-semibold">Documents</h2>
+    <section className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-sm">
+      <h2 className="text-sm font-semibold text-zinc-900">Documents</h2>
       <button onClick={() => input.current?.click()} disabled={!!p.uploading}
         onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) p.onUpload(f); }}
-        className="w-full rounded-lg border-2 border-dashed border-zinc-300 p-4 text-sm text-zinc-600 hover:border-indigo-400 disabled:opacity-60">
+        className="w-full rounded-lg border-2 border-dashed border-zinc-300 p-4 text-sm text-zinc-600 transition hover:border-indigo-400 hover:bg-indigo-50/50 disabled:opacity-60">
         {p.uploading ? `Embedding ${p.uploading}…` : "Drop a PDF or click to upload"}
       </button>
       <input ref={input} type="file" accept="application/pdf" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) p.onUpload(f); e.target.value = ""; }} />

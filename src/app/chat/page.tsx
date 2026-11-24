@@ -15,18 +15,25 @@ export default function ChatPage() {
   const docs = useDocuments(ready, refresh);
   const chat = useChat(refresh);
   return (
-    <main className="mx-auto grid max-w-6xl gap-4 p-4 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <Link href="/" className="block text-lg font-semibold">DocChat</Link>
-        <DocumentList items={docs.items} uploading={docs.uploading} error={docs.error} onUpload={docs.upload} onRemove={docs.remove} />
-        <UsagePanel usage={usage} />
-        <ApiKeyForm />
-        <section className="rounded-xl border border-zinc-200 bg-white p-4 text-xs text-zinc-600">
-          {expiresAt && <p>Everything is deleted automatically at {new Date(expiresAt).toLocaleString()}.</p>}
-          <button onClick={endNow} className="mt-2 text-red-600 underline">Delete my data now</button>
-        </section>
-      </aside>
-      <ChatPanel messages={chat.messages} pending={chat.pending} onAsk={chat.ask} disabled={!docs.items.length} />
-    </main>
+    <div className="flex h-dvh flex-col bg-slate-50 text-zinc-900">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-5">
+        <Link href="/" className="flex items-center gap-2 font-semibold">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold text-white">D</span>
+          DocChat
+        </Link>
+        <div className="flex items-center gap-4 text-xs text-zinc-500">
+          {expiresAt && <span className="hidden sm:inline">Auto-deletes {new Date(expiresAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>}
+          <button onClick={endNow} className="rounded-md border border-zinc-200 px-2.5 py-1 font-medium text-red-600 hover:bg-red-50">Delete my data</button>
+        </div>
+      </header>
+      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-4 overflow-hidden p-4 lg:grid-cols-[340px_1fr]">
+        <aside className="space-y-4 overflow-y-auto pb-4">
+          <DocumentList items={docs.items} uploading={docs.uploading} error={docs.error} onUpload={docs.upload} onRemove={docs.remove} />
+          <UsagePanel usage={usage} />
+          <ApiKeyForm />
+        </aside>
+        <ChatPanel messages={chat.messages} pending={chat.pending} onAsk={chat.ask} disabled={!docs.items.length} />
+      </main>
+    </div>
   );
 }
